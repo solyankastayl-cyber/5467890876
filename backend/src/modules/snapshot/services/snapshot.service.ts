@@ -71,7 +71,7 @@ class SnapshotService {
       await SnapshotModel.create(snapshot);
       
       // Build share URL
-      const baseUrl = process.env.REACT_APP_BACKEND_URL || 'https://order-state-verify.preview.emergentagent.com';
+      const baseUrl = process.env.REACT_APP_BACKEND_URL || 'https://trade-optimizer-24.preview.emergentagent.com';
       const shareUrl = `${baseUrl}/snapshot/${snapshotId}`;
       
       console.log(`[Snapshot] Created: ${snapshotId} for ${req.symbol}`);

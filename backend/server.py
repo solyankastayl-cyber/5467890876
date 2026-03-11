@@ -897,6 +897,15 @@ except ImportError as e:
     print(f"[Routes] Market Data Engine not available: {e}")
 
 
+# PHASE 5.3 Order Routing Engine Router
+try:
+    from modules.execution.order_routing.routing_routes import router as routing_router
+    app.include_router(routing_router)
+    print("[Routes] PHASE 5.3 Order Routing Engine router registered")
+except ImportError as e:
+    print(f"[Routes] Order Routing Engine not available: {e}")
+
+
 
 
 # ============================================

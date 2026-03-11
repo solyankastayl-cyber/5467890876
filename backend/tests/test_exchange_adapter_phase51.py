@@ -20,7 +20,7 @@ from datetime import datetime
 # Get base URL from environment
 BASE_URL = os.environ.get("REACT_APP_BACKEND_URL", "").rstrip("/")
 if not BASE_URL:
-    BASE_URL = "https://a642aa60-a4e7-46b2-aeaf-4f5327791fbd.preview.emergentagent.com"
+    BASE_URL = "https://trade-optimizer-24.preview.emergentagent.com"
 
 
 class TestExchangeHealth:

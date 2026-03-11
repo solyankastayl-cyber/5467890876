@@ -150,13 +150,22 @@ class MarketDataNormalizer:
     
     def _binance_orderbook(self, data: Dict[str, Any]) -> MarketOrderbook:
         """Binance orderbook format"""
+        raw_bids = data.get("bids", data.get("b", []))
+        raw_asks = data.get("asks", data.get("a", []))
+        
+        # Ensure bids/asks are lists, not 0 or other invalid values
+        if not isinstance(raw_bids, list):
+            raw_bids = []
+        if not isinstance(raw_asks, list):
+            raw_asks = []
+        
         bids = [
             OrderbookLevel(price=float(b[0]), size=float(b[1]))
-            for b in data.get("bids", data.get("b", []))
+            for b in raw_bids if isinstance(b, (list, tuple)) and len(b) >= 2
         ]
         asks = [
             OrderbookLevel(price=float(a[0]), size=float(a[1]))
-            for a in data.get("asks", data.get("a", []))
+            for a in raw_asks if isinstance(a, (list, tuple)) and len(a) >= 2
         ]
         
         ob = MarketOrderbook(
@@ -230,13 +239,22 @@ class MarketDataNormalizer:
     
     def _bybit_orderbook(self, data: Dict[str, Any]) -> MarketOrderbook:
         """Bybit orderbook format"""
+        raw_bids = data.get("b", data.get("bids", []))
+        raw_asks = data.get("a", data.get("asks", []))
+        
+        # Ensure bids/asks are lists, not 0 or other invalid values
+        if not isinstance(raw_bids, list):
+            raw_bids = []
+        if not isinstance(raw_asks, list):
+            raw_asks = []
+        
         bids = [
             OrderbookLevel(price=float(b[0]), size=float(b[1]))
-            for b in data.get("b", data.get("bids", []))
+            for b in raw_bids if isinstance(b, (list, tuple)) and len(b) >= 2
         ]
         asks = [
             OrderbookLevel(price=float(a[0]), size=float(a[1]))
-            for a in data.get("a", data.get("asks", []))
+            for a in raw_asks if isinstance(a, (list, tuple)) and len(a) >= 2
         ]
         
         ob = MarketOrderbook(
@@ -330,13 +348,22 @@ class MarketDataNormalizer:
         """OKX orderbook format"""
         symbol = data.get("instId", "").replace("-SWAP", "").replace("-", "")
         
+        raw_bids = data.get("bids", [])
+        raw_asks = data.get("asks", [])
+        
+        # Ensure bids/asks are lists, not 0 or other invalid values
+        if not isinstance(raw_bids, list):
+            raw_bids = []
+        if not isinstance(raw_asks, list):
+            raw_asks = []
+        
         bids = [
             OrderbookLevel(price=float(b[0]), size=float(b[1]), orders_count=int(b[3]) if len(b) > 3 else 0)
-            for b in data.get("bids", [])
+            for b in raw_bids if isinstance(b, (list, tuple)) and len(b) >= 2
         ]
         asks = [
             OrderbookLevel(price=float(a[0]), size=float(a[1]), orders_count=int(a[3]) if len(a) > 3 else 0)
-            for a in data.get("asks", [])
+            for a in raw_asks if isinstance(a, (list, tuple)) and len(a) >= 2
         ]
         
         ob = MarketOrderbook(
@@ -395,8 +422,23 @@ class MarketDataNormalizer:
     
     def _generic_orderbook(self, exchange: str, data: Dict[str, Any]) -> MarketOrderbook:
         """Generic orderbook normalizer"""
-        bids = [OrderbookLevel(price=float(b[0]), size=float(b[1])) for b in data.get("bids", [])]
-        asks = [OrderbookLevel(price=float(a[0]), size=float(a[1])) for a in data.get("asks", [])]
+        raw_bids = data.get("bids", [])
+        raw_asks = data.get("asks", [])
+        
+        # Ensure bids/asks are lists, not 0 or other invalid values
+        if not isinstance(raw_bids, list):
+            raw_bids = []
+        if not isinstance(raw_asks, list):
+            raw_asks = []
+        
+        bids = [
+            OrderbookLevel(price=float(b[0]), size=float(b[1]))
+            for b in raw_bids if isinstance(b, (list, tuple)) and len(b) >= 2
+        ]
+        asks = [
+            OrderbookLevel(price=float(a[0]), size=float(a[1]))
+            for a in raw_asks if isinstance(a, (list, tuple)) and len(a) >= 2
+        ]
         
         ob = MarketOrderbook(
             exchange=exchange,

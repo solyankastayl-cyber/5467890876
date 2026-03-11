@@ -1,0 +1,188 @@
+<analysis>**original_problem_statement:**
+The user wants to build a sophisticated, multi-module trading application. The development is broken down into distinct phases.
+
+**Initial Request (TA Engine):**
+*   Bootstrap a minimal backend runtime for a Technical Analysis (TA) Engine.
+*   This includes , , , and an .
+*   The architecture must be modular so the TA Engine can be a portable package.
+*   Dependencies should be managed via interfaces (, , ).
+*   Required endpoints: , , .
+
+**PRODUCT REQUIREMENTS (Phased Development):**
+
+*   **PHASE 4.4 — Failover Engine:**
+    *   Create a module to handle infrastructure risks like exchange outages, API timeouts, latency spikes, and network disconnects.
+    *   Implement monitors for exchange health, latency, and rate limits.
+    *   Define system statuses: NORMAL, DEGRADED, FAILOVER, EMERGENCY.
+    *   Store events and history in a repository.
+    *   Expose status and event data via a REST API ().
+
+*   **PHASE 5.1 — Exchange Adapter Layer:**
+    *   Create a universal layer for interacting with different crypto exchanges (Binance, Bybit, OKX).
+    *   Define a  interface.
+    *   Standardize internal data models for orders, positions, and balances.
+    *   Implement an  to direct requests to the appropriate exchange.
+    *   Include a  for live data streams.
+    *   Expose functionality via a REST API ().
+
+*   **PHASE 5.2 — Live Market Data Engine:**
+    *   Create a module to process real-time market data from exchange WebSockets.
+    *   Define unified data types for ticks, candles, and order books.
+    *   Implement a  to handle different exchange formats.
+    *   Include a  to construct candles from live ticks.
+    *   Build processors for ticker, order book, and volume streams.
+    *   Provide aggregated .
+    *   Expose data via a REST API ().
+
+*   **PHASE 5.3 — Order Routing Engine:**
+    *   Create a module to intelligently decide where and how to send orders.
+    *   Implement a  to choose the best exchange based on price, liquidity, and health.
+    *   Define  (e.g., BEST_PRICE, SAFEST_VENUE).
+    *   Create an  for splitting large orders.
+    *   The router must be aware of data from the  and .
+    *   Log all routing decisions.
+    *   Expose functionality via a REST API ().
+
+**User's preferred language**: Русский (Russian)
+
+**what currently exists?**
+The agent has cloned the user's repository and successfully implemented several core backend modules as per the phased requirements.
+- **Completed:** PHASE 4.4 (Failover Engine), PHASE 5.1 (Exchange Adapter Layer), and PHASE 5.2 (Live Market Data Engine). Each of these phases was implemented, tested, and verified.
+- **In Progress:** PHASE 5.3 (Order Routing Engine). The file structure has been created, but development is blocked by a bug in the Market Data module.
+
+**Last working item**:
+*   Last item agent was working: The agent was debugging a  that occurs when starting the market data feed. The error originates in the , which fails when it receives malformed order book data from the . The normalizer appears to be incorrectly providing a  value instead of an empty list  for bids/asks when the exchange payload is missing them.
+*   Status: **IN PROGRESS**
+*   Agent Testing Done: N
+*   Which testing method agent to use? manual testing by curl
+*   User Testing Done: N
+
+**All Pending/In progress Issue list**:
+*   Issue 1:  in  prevents market data feed from starting. (Priority: **P0**)
+
+Issues Detail:
+- **Issue 1:  in **
+    -   **Attempted fixes:** The agent tried to add a guard clause in the  file within the  method to check for empty bids/asks. This did not solve the issue because the  happens earlier, during the instantiation of the  object, due to the invalid  value.
+    -   **Next debug checklist:**
+        1.  Go to .
+        2.  Inspect the  method.
+        3.  Modify the logic to ensure that if  or  are missing from the raw data, they default to an empty list () instead of . For example: .
+        4.  After applying the fix, restart the backend (backend: stopped
+backend: started).
+        5.  Attempt to start the market data stream again using the  command: .
+    -   **Why fix this issue and what will be achieved with the fix?** The Order Routing Engine (Phase 5.3) depends on live market data, including order books, to make routing decisions. This bug completely blocks the market data feed, thus blocking all further development and testing of the routing engine.
+    -   **Status:** IN PROGRESS
+    -   **Is recurring issue?** N
+    -   **Should Test frontend/backend/both after fix?** backend
+    -   **Blocked on other issue:** None
+
+**In progress Task List**:
+- **Task 1: Complete PHASE 5.3 — Order Routing Engine** (Priority: **P0**)
+    -   **Where to resume:** The implementation is blocked by the market data feed bug. Once **Issue 1** is resolved, the agent must resume testing the  endpoints to verify the functionality of the , , and integration with the failover and slippage modules.
+    -   **What will be achieved with this?** The system will gain a critical decision-making layer that can intelligently route trade orders across different exchanges, optimizing for factors like best price, lowest slippage, and exchange reliability.
+    -   **Status:** BLOCKED
+    -   **Should Test frontend/backend/both after fix?** backend
+    -   **Blocked on something:** Issue 1:  in .
+
+**Upcoming and Future Tasks**
+*   **Upcoming Tasks:**
+    *   **PHASE 5.4 — Portfolio Accounts Engine (P1):** Create a module to aggregate and manage account information (balances, margin, state) from multiple exchanges.
+*   **Future Tasks:**
+    *   **PHASE 12 — Advanced Engines (P2):** Implement Hypothesis Engine, Scenario Engine, and Calibration Engine.
+    *   **Final Integration (P2):** Connect the TA Engine as a module into the main FOMO Platform.
+
+**Completed work in this session**
+- **PHASE 4.4 — Failover Engine (DONE):** Verified existing implementation, ran all tests successfully (36/36), and confirmed all API endpoints are working.
+- **PHASE 5.1 — Exchange Adapter Layer (DONE):** Implemented a unified adapter structure for Binance, Bybit, and OKX. Created a router, WebSocket manager, and standardized data types. Passed all tests (27/27) after fixing a connection issue with the Bybit adapter.
+- **PHASE 5.2 — Live Market Data Engine (DONE):** Implemented the full module for ingesting, normalizing, and processing real-time market data. All initial tests passed (17/17). A latent bug was discovered later during the implementation of Phase 5.3.
+- **PHASE 5.3 — Order Routing Engine (File Structure Created):** All necessary files and directories under  have been created.
+
+**Earlier issues found/mentioned but not fixed**
+- None.
+
+**Known issue recurrence from previous fork**
+- N/A
+
+**Code Architecture**
+
+
+**Key Technical Concepts**
+*   **Backend:** FastAPI (Python)
+*   **Database:** MongoDB
+*   **Architecture:** Modular, Service-Oriented Architecture (SOA) where features like Failover, Exchanges, Market Data, and Order Routing are isolated modules.
+*   **Design Pattern:** The system heavily uses the Adapter pattern for exchange integrations and relies on unified data models (types) to decouple business logic from specific exchange implementations.
+
+**key DB schema**
+While not explicitly detailed, each module has a repository that implies a schema:
+-   **failover_repository:** , 
+-   **exchange_repository:** , 
+-   **market_data_repository:** , 
+-   **routing_repository:** , , 
+
+**changes in tech stack**
+- None. The stack has remained Python/FastAPI and MongoDB.
+
+**All files of reference**
+*   : The main FastAPI application file where all module routes are registered.
+*   : **File to be fixed.** Contains the logic that is likely causing the .
+*   : The file where the error manifests.
+*   : The directory for the current in-progress task.
+*   : A temporary mock/adapter created to unblock development, as the full  was not available.
+
+**Areas that need refactoring**:
+*   The  functionality was stubbed out with a simple adapter () to allow progress on the . This should be replaced with a proper implementation of the  (Phase 4.3) in the future.
+
+**key api endpoints**
+*   
+*   
+*   
+*   
+
+**Critical Info for New Agent**
+*   You must respond to the user in **Russian**.
+*   The primary task is to fix the bug in the  to unblock the market data feed. This is **P0 priority**.
+*   After fixing the bug, resume the implementation and testing of **PHASE 5.3 — Order Routing Engine**.
+*   The project is built in phases. Adhere strictly to the user's phased requirements and acceptance criteria for each task.
+*   Be aware that  is currently a mock. The routing engine's integration with it is therefore simplified.
+
+**documents and test reports created in this job**
+*   
+*   Test reports from the  are located in .
+
+**Last 10 User Messages and any pending HUMAN messages**
+1.  **User:** Defines requirements for PHASE 5.3 (Order Routing Engine).
+2.  **Agent:** Acknowledges and starts work on PHASE 5.3.
+3.  **Agent:** Creates file structure for the routing module.
+4.  **Agent:** Registers routes and encounters import errors.
+5.  **Agent:** Debugs missing  and  instances.
+6.  **Agent:** Creates a mock  to resolve a dependency.
+7.  **Agent:** Attempts to test endpoints by starting the market data feed.
+8.  **Agent:** Encounters a  in the .
+9.  **Agent:** Debugs the error, suspecting an issue with how empty order books are handled.
+10. **Agent:** The last action was to inspect the  to find the root cause of the malformed data.
+
+**Project Health Check:**
+*   **Broken:**
+    *   The Live Market Data feed is non-functional due to a  in the order book processing logic. This is a critical blocker.
+*   **Mocked:**
+    *   : A simplified adapter () was created to allow the  to be developed. This is not a production-ready implementation.
+
+**3rd Party Integrations**
+*   Binance (direct integration, not via playbook)
+*   Bybit (direct integration, not via playbook)
+*   OKX (direct integration, not via playbook)
+
+**Testing status**
+*   Testing agent used after significant changes: YES
+*   Troubleshoot agent used after agent stuck in loop: NO
+*   Test files created:
+    *   
+    *   
+    *   
+*   Known regressions: None.
+
+**Credentials to test flow:**
+N/A. The application uses testnet/mock endpoints that do not require credentials.
+
+**What agent forgot to execute**
+The agent correctly identified that the  (Phase 4.3) was not fully implemented and created a workaround (an adapter) to proceed with the  (Phase 5.3). This was a pragmatic choice to avoid getting blocked, but it means Phase 4.3 is not actually complete as per the user's original architectural plan.</analysis>

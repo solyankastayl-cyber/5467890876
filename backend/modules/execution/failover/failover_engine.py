@@ -168,6 +168,20 @@ class FailoverEngine:
         """Получить текущее состояние"""
         return self._state
     
+    def get_system_status(self) -> Dict[str, Any]:
+        """Получить системный статус в виде словаря для routing engine"""
+        return {
+            "system_status": self._state.system_status.value,
+            "execution_paused": self._state.execution_paused,
+            "new_positions_allowed": self._state.new_positions_allowed,
+            "throttle_factor": self._state.throttle_factor,
+            "position_size_factor": self._state.position_size_factor,
+            "active_actions": [a.value for a in self._state.active_actions],
+            "active_failover_exchanges": self._state.active_failover_exchanges,
+            "recent_errors": self._state.recent_errors,
+            "timestamp": self._state.updated_at.isoformat() if self._state.updated_at else None
+        }
+    
     def get_exchange_status(self, exchange: str) -> Dict[str, Any]:
         """Получить статус конкретной биржи"""
         health = self.health_monitor.get_health(exchange)
@@ -375,3 +389,16 @@ class FailoverEngine:
         # Keep only recent events
         if len(self._events) > 1000:
             self._events = self._events[-500:]
+
+
+
+# Global instance
+_failover_engine = None
+
+
+def get_failover_engine():
+    """Get or create global failover engine instance"""
+    global _failover_engine
+    if _failover_engine is None:
+        _failover_engine = FailoverEngine()
+    return _failover_engine
