@@ -906,6 +906,13 @@ except ImportError as e:
     print(f"[Routes] Order Routing Engine not available: {e}")
 
 
+# PHASE 5.4 Portfolio Accounts Engine Router
+try:
+    from modules.portfolio_accounts.account_routes import router as portfolio_accounts_router
+    app.include_router(portfolio_accounts_router)
+    print("[Routes] PHASE 5.4 Portfolio Accounts Engine router registered")
+except ImportError as e:
+    print(f"[Routes] Portfolio Accounts Engine not available: {e}")
 
 
 # ============================================
