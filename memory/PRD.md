@@ -72,3 +72,38 @@ Advanced algorithmic trading platform for cryptocurrency markets.
 - Database: MongoDB
 - Exchanges: Binance, Bybit, OKX
 - Testing: 96%+ pass rate
+
+---
+
+## PHASE 5.2 - Live Market Data Engine (2026-03-11)
+
+### Files Created:
+- `/app/backend/modules/market_data/market_data_types.py` - Unified types
+- `/app/backend/modules/market_data/market_data_engine.py` - Main orchestrator
+- `/app/backend/modules/market_data/market_data_normalizer.py` - Exchange normalization
+- `/app/backend/modules/market_data/candle_builder.py` - Live candle building
+- `/app/backend/modules/market_data/stream_processors.py` - Ticker/Orderbook/Volume processors
+- `/app/backend/modules/market_data/market_snapshot_builder.py` - Aggregated snapshots
+- `/app/backend/modules/market_data/market_data_repository.py` - Persistence
+- `/app/backend/modules/market_data/market_data_routes.py` - REST API
+
+### API Endpoints:
+- `POST /api/market-data/start` - Start feed
+- `POST /api/market-data/stop` - Stop feed
+- `GET /api/market-data/status` - Engine status
+- `GET /api/market-data/snapshot/{symbol}` - Live snapshot
+- `GET /api/market-data/ticker/{symbol}` - Live ticker
+- `GET /api/market-data/orderbook/{symbol}` - Live orderbook
+- `GET /api/market-data/candles/{symbol}/{timeframe}` - Live candles
+- `GET /api/market-data/volume/{symbol}` - Volume metrics
+- `GET /api/market-data/exchanges` - Active exchanges
+
+### Features:
+- Multi-timeframe candle building (1m, 5m, 15m, 1h, 4h, 1d)
+- Real-time spread monitoring
+- Volume spike detection
+- VWAP calculation
+- Volatility tracking
+- Multi-exchange aggregation
+
+### Tests: 17/17 passed (100%)
