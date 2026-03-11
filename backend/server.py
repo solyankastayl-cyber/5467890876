@@ -888,6 +888,15 @@ try:
 except ImportError as e:
     print(f"[Routes] Exchange Adapter not available: {e}")
 
+# PHASE 5.2 Live Market Data Engine Router
+try:
+    from modules.market_data.market_data_routes import router as market_data_router
+    app.include_router(market_data_router)
+    print("[Routes] PHASE 5.2 Live Market Data Engine router registered")
+except ImportError as e:
+    print(f"[Routes] Market Data Engine not available: {e}")
+
+
 
 
 # ============================================
