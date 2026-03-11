@@ -880,6 +880,15 @@ try:
 except ImportError as e:
     print(f"[Routes] Failover Engine not available: {e}")
 
+# PHASE 5.1 Exchange Adapter Layer Router
+try:
+    from modules.exchanges.exchange_routes import router as exchange_router
+    app.include_router(exchange_router)
+    print("[Routes] PHASE 5.1 Exchange Adapter Layer router registered")
+except ImportError as e:
+    print(f"[Routes] Exchange Adapter not available: {e}")
+
+
 
 # ============================================
 # ML Inference Endpoints (Direct Python)
