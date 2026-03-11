@@ -27,9 +27,18 @@ Advanced algorithmic trading platform for cryptocurrency markets.
   - Exchange Router
   - WebSocket Manager
   - Unified Types (Orders, Positions, Balances)
-- **5.2** Live Market Data Engine (Next)
-- **5.3** Order Routing Engine
-- **5.4** Portfolio Accounts Engine
+- **5.2** Live Market Data Engine ✅ (Complete)
+  - Market Data Normalizer
+  - Ticker/Orderbook/Volume Processors
+  - Candle Builder (multi-timeframe)
+  - Market Snapshot Builder
+- **5.3** Order Routing Engine ✅ (Complete)
+  - Venue Selector
+  - Routing Policies (BEST_PRICE, BEST_EXECUTION, SAFEST_VENUE, etc.)
+  - Execution Plan Builder
+  - Slippage-aware Router (MOCKED)
+  - Failover Integration
+- **5.4** Portfolio Accounts Engine (Next)
 
 ## What's Implemented (2026-03-11)
 
@@ -62,10 +71,10 @@ Advanced algorithmic trading platform for cryptocurrency markets.
   - `GET /api/exchange/history/*` - History endpoints
 
 ## P0/P1 Backlog
-- P0: PHASE 5.2 Live Market Data Engine
-- P0: PHASE 5.3 Order Routing Engine
 - P1: PHASE 5.4 Portfolio Accounts Engine
+- P1: Replace MOCKED SlippageEngine with full implementation (Phase 4.3)
 - P1: Real API credentials integration
+- P2: PHASE 12 Advanced Engines (Hypothesis, Scenario, Calibration)
 
 ## Tech Stack
 - Backend: Python/FastAPI
@@ -107,3 +116,44 @@ Advanced algorithmic trading platform for cryptocurrency markets.
 - Multi-exchange aggregation
 
 ### Tests: 17/17 passed (100%)
+
+---
+
+## PHASE 5.3 - Order Routing Engine (2026-03-11)
+
+### Files Created:
+- `/app/backend/modules/execution/order_routing/routing_types.py` - Routing data types
+- `/app/backend/modules/execution/order_routing/routing_engine.py` - Main routing orchestrator
+- `/app/backend/modules/execution/order_routing/venue_selector.py` - Venue analysis & selection
+- `/app/backend/modules/execution/order_routing/execution_plan_builder.py` - Order splitting & planning
+- `/app/backend/modules/execution/order_routing/slippage_aware_router.py` - Slippage integration (MOCKED)
+- `/app/backend/modules/execution/order_routing/routing_repository.py` - Persistence
+- `/app/backend/modules/execution/order_routing/routing_routes.py` - REST API
+
+### API Endpoints:
+- `POST /api/routing/evaluate` - Evaluate routing options, get decision
+- `POST /api/routing/plan` - Create execution plan
+- `POST /api/routing/execute-plan` - Execute a plan
+- `GET /api/routing/venues/{symbol}` - Venue analysis
+- `GET /api/routing/best-venues/{symbol}` - Top N venues
+- `GET /api/routing/slippage/{symbol}` - Slippage analysis
+- `GET /api/routing/history` - Routing decision history
+- `GET /api/routing/events` - Routing events log
+- `GET /api/routing/stats` - Routing statistics
+- `GET /api/routing/policies` - Available policies
+
+### Features:
+- 6 Routing Policies: BEST_PRICE, BEST_EXECUTION, SAFEST_VENUE, LOW_SLIPPAGE, LOWEST_FEE, SPLIT_ORDER
+- 4 Urgency Levels: LOW, NORMAL, HIGH, IMMEDIATE
+- Failover-aware routing (integrates with Phase 4.4)
+- Order splitting for large orders
+- Venue scoring (price, spread, liquidity, health)
+
+### Bugs Fixed (2026-03-11):
+1. **TypeError in MarketDataNormalizer** - Added validation for bids/asks to ensure they are lists
+2. **AttributeError in RoutingEngine** - Added get_system_status() method to FailoverEngine
+
+### Tests: 19/19 passed (100%)
+
+### MOCKED Components:
+- SlippageEngine via slippage_adapter.py (simplified slippage predictions)
